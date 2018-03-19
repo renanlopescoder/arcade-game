@@ -3,6 +3,7 @@ class Enemy {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.speed = [300, 400, 500][Math.floor(Math.random() * 3)];
         this.sprite = 'images/enemy-bug.png';
     }
 
@@ -12,6 +13,8 @@ class Enemy {
         // You should multiply any movement by the dt parameter
         // which will ensure the game runs at the same speed for
         // all computers.
+        this.x += this.speed * dt;
+        this.x > 500 ? allEnemies.delete(this) : null;
     };
 
     // Draw the enemy on the screen, required method for game
@@ -36,11 +39,11 @@ class Player {
         switch (key) {
             case 'left': this.x > 0 ? this.x -= 100 : null;
                 break;
-            case 'up': this.y > 0 ? this.y -= 85: null;
+            case 'up': this.y > 0 ? this.y -= 85 : null;
                 break;
             case 'right': this.x < 400 ? this.x += 100 : null;
                 break;
-            case 'down':this.y < 400 ? this.y += 85: null;
+            case 'down': this.y < 400 ? this.y += 85 : null;
                 break;
         }
     }
@@ -48,7 +51,8 @@ class Player {
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
-var allEnemies = [new Enemy(300, 230)];
+var allEnemies = new Set();
+setInterval(() => allEnemies.add(new Enemy(-100, [65, 150, 230][Math.floor(Math.random() * 3)])), 600)
 
 // Place the player object in a variable called player
 var player = new Player(200, 400);
