@@ -78,7 +78,7 @@ var Engine = (function (global) {
         reset();
         lastTime = Date.now();
         main();
-        setInterval(() => allEnemies.add(new Enemy(-100, [60, 143, 226][Math.floor(Math.random() * 3)])), 600);
+        setInterval(() => allEnemies.add(new Enemy(-100, [68, 151, 234][Math.floor(Math.random() * 3)])), 600);
         doc.querySelector('.container').insertAdjacentHTML('beforeend', scorepanel);
         doc.querySelector('.container').appendChild(canvas);
         ui.start.style.display = 'none';
@@ -109,8 +109,17 @@ var Engine = (function (global) {
          */
         function update(dt) {
             updateEntities(dt);
-            // checkCollisions();
+            checkCollisions();
         }
+
+        function checkCollisions(){
+            allEnemies.forEach( enemy => {
+                if((enemy.x> player.x-30 && enemy.x < player.x +70)&& enemy.y === player.y){
+                    player.x=200;
+                    player.y=400;
+                    player.lives--;
+                }});
+            };
 
         /* This is called by the update function and loops through all of the
          * objects within your allEnemies array as defined in app.js and calls
