@@ -1,3 +1,13 @@
+const ui = {
+    start: document.querySelector('.start'),
+    newGame: document.querySelector('.new-game'),
+    scorePanel: document.querySelector('.score-panel'),
+    stars: document.querySelectorAll(".stars"),
+    score: document.querySelector(".score"),
+    lives: document.querySelectorAll(".lives"),
+    restart: document.querySelector('.restart'),
+}
+
 // Enemies our player must avoid
 class Enemy {
     constructor(x, y) {
@@ -24,9 +34,10 @@ class Enemy {
 }
 // Now write your own player class
 class Player {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
+    constructor() {
+        this.x = 200;
+        this.y = 400;
+        this.lives = 3
         this.char = 'images/char-boy.png';
     }
     // This class requires an update(), render() and
@@ -35,16 +46,28 @@ class Player {
     render() {
         ctx.drawImage(Resources.get(this.char), this.x, this.y);
     };
-    handleInput(key) {
+    handleInput({ key, x, y } = {}) {
+        // Keyboard input(Arrow keys)
         switch (key) {
-            case 'left': this.x > 0 ? this.x -= 100 : null;
+            case 'left': this.x > 0 ? this.x -= 101 : null;
                 break;
-            case 'up': this.y > 0 ? this.y -= 85 : null;
+            case 'right': this.x < 400 ? this.x += 101 : null;
                 break;
-            case 'right': this.x < 400 ? this.x += 100 : null;
+            case 'up': this.y > 0 ? this.y -= 83 : null;
                 break;
-            case 'down': this.y < 400 ? this.y += 85 : null;
+            case 'down': this.y < 400 ? this.y += 83 : null;
                 break;
+        };
+
+        // Mouse input(click)
+        if (x < this.x && (y - 65 > this.y && this.y + 145 > y)) {
+            this.x > 0 ? this.x -= 101 : null;
+        } else if (x - 100 > this.x && (y - 65 > this.y && this.y + 145 > y)) {
+            this.x < 400 ? this.x += 101 : null;
+        } else if (y - 65 < this.y && (x > this.x && this.x + 100 > x)) {
+            this.y > 0 ? this.y -= 83 : null;
+        } else if (y - 145 > this.y && (x > this.x && this.x + 100 > x)) {
+            this.y < 400 ? this.y += 83 : null;
         }
     }
 }
@@ -52,21 +75,6 @@ class Player {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 var allEnemies = new Set();
-setInterval(() => allEnemies.add(new Enemy(-100, [65, 150, 230][Math.floor(Math.random() * 3)])), 600)
 
 // Place the player object in a variable called player
-var player = new Player(200, 400);
-
-
-// This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
-document.addEventListener('keyup', function (e) {
-    var allowedKeys = {
-        37: 'left',
-        38: 'up',
-        39: 'right',
-        40: 'down'
-    };
-
-    player.handleInput(allowedKeys[e.keyCode]);
-});
+var player = new Player();
