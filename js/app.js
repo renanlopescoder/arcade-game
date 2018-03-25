@@ -10,10 +10,12 @@ const game = {
         score: document.querySelector(".score"),
         lives: document.querySelector(".lives"),
         heart: `<img src="images/Heart.png" alt="">`,
+        gameOver: document.querySelector('.game-over'),
         restart: document.querySelector('.restart'),
         update() {
             game.ui.lives.innerHTML = game.ui.heart.repeat(player.lives);
             game.ui.score.innerHTML = player.score;
+            game.ui.stars.innerHTML = game.ui.star.repeat(player.score >= 3000 ? 5 : player.score / 600 + 1);
 
         }
     },
@@ -22,21 +24,26 @@ const game = {
             if ((enemy.x > player.x - 30 && enemy.x < player.x + 70) && enemy.y === player.y) {
                 player.x = [100, 200, 300][Math.floor(Math.random() * 3)];
                 player.y = 390;
-                player.lives > 0 ? player.lives-- : null;
+                player.multiplier = 1;
+                player.lives > 1 ? player.lives-- : (player.lives-- , game.gameOver());
                 game.ui.update();
             }
         });
-        if(player.y===-25) {
+
+        if (player.y === -25) {
             player.x = [100, 200, 300][Math.floor(Math.random() * 3)];
             player.y = 390;
-            player.score +=100;
+            player.score += player.multiplier * 100;
+            player.multiplier++;
             game.ui.update();
         }
     },
 
     start() {
         // generate enemies
-        setInterval(() => allEnemies.add(new Enemy(-100, [58, 141, 224][Math.floor(Math.random() * 3)])), 600);
+        allEnemies.add(new Enemy());
+        allEnemies.add(new Enemy());
+        allEnemies.add(new Enemy());
         // Update ui
         game.ui.update();
         game.ui.container.appendChild(game.ui.canvas);
@@ -58,13 +65,27 @@ const game = {
             player.handleInput({ x: e.clientX - rect.left, y: e.clientY - rect.top });
         });
 
+    },
+
+    gameOver() {
+        allEnemies.clear();
+        game.ui.scorePanel.style.display = 'none';
+        game.ui.container.removeChild(game.ui.canvas);
+        game.ui.gameOver.style.display = 'flex';
+        game.ui.gameOver.innerHTML = `Game Over
+        <div class="stars">${game.ui.stars.innerHTML}</div>
+        <div class="score">${game.ui.score.innerHTML}</div>`;
+        game.ui.gameOver.appendChild(game.ui.newGame);
+
+        // document.removeEventListener('keyup')
+        // game.ui.canvas.removeEventListener('click')
     }
 };
 // Enemies our player must avoid
 class Enemy {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
+    constructor() {
+        this.x = [-100, -200, -300][Math.floor(Math.random() * 3)];;
+        this.y = [58, 141, 224][Math.floor(Math.random() * 3)];
         this.speed = [300, 400, 500][Math.floor(Math.random() * 3)];
         this.sprite = 'images/enemy-bug.png';
     }
@@ -76,20 +97,24 @@ class Enemy {
         // which will ensure the game runs at the same speed for
         // all computers.
         this.x += this.speed * dt;
-        this.x > 500 ? allEnemies.delete(this) : null;
+        if (this.x > 500) {
+            allEnemies.delete(this)
+            allEnemies.add(new Enemy(-100, [58, 141, 224][Math.floor(Math.random() * 3)]))
+        };
     };
 
     // Draw the enemy on the screen, required method for game
     render() {
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    };
+    }
 }
 // Now write your own player class
 class Player {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
+    constructor() {
+        this.x = 200;
+        this.y = 390;
         this.lives = 3;
+        this.multiplier = 1;
         this.score = 0;
         this.char = 'images/char-boy.png';
     }
@@ -130,4 +155,4 @@ class Player {
 var allEnemies = new Set();
 
 // Place the player object in a variable called player
-var player = new Player(200, 390);
+var player = new Player();

@@ -160,7 +160,11 @@ var Engine = (function (global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        player.x = 200;
+        player.y = 390;
+        player.lives = 3;
+        player.multiplier = 1;
+        player.score = 0;
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -176,6 +180,8 @@ var Engine = (function (global) {
     ]);
     game.ui.newGame.addEventListener('click', function () {
         init();
+        game.ui.gameOver.style.display='none';
+        game.ui.scorePanel.style.display='flex';
     });
 
     /* Assign the canvas' context object to the global variable (the window
